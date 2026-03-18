@@ -1,6 +1,7 @@
 const tilForm = document.querySelector("#til-form");
 const tilList = document.querySelector("#til-list");
 
+// 1. TIL 등록 기능 구현
 tilForm.addEventListener("submit", function (event) {
   event.preventDefault();
 
@@ -10,21 +11,41 @@ tilForm.addEventListener("submit", function (event) {
 
   const newArticle = document.createElement("article");
   newArticle.classList.add("til-item");
+  // 애니메이션 효과를 위해 초기 스타일 설정
+  newArticle.style.opacity = "0";
+  newArticle.style.transform = "translateX(-20px)";
 
-  const timeEl = document.createElement("time");
-  timeEl.textContent = dateInput;
+  newArticle.innerHTML = `
+    <time>${dateInput}</time>
+    <h3>${titleInput}</h3>
+    <p>${contentInput}</p>
+  `;
 
-  const h3El = document.createElement("h3");
-  h3El.textContent = titleInput;
+  tilList.prepend(newArticle); // 최신 글이 위로 오도록 prepend 사용
 
-  const pEl = document.createElement("p");
-  pEl.textContent = contentInput;
-
-  newArticle.appendChild(timeEl);
-  newArticle.appendChild(h3El);
-  newArticle.appendChild(pEl);
-
-  tilList.appendChild(newArticle);
+  // 부드럽게 나타나는 효과
+  setTimeout(() => {
+    newArticle.style.opacity = "1";
+    newArticle.style.transform = "translateX(0)";
+  }, 10);
 
   tilForm.reset();
 });
+
+// 2. 스크롤 애니메이션 (Intersection Observer)
+const observerOptions = {
+  threshold: 0.1
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.content-section').forEach(section => {
+  observer.observe(section);
+});
+
